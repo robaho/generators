@@ -11,7 +11,15 @@ public class GeneratorTest {
     }
     private static void test(int max) {
         int count=0;
-        for(int i : new IntGenerator(100)) {
+
+        Generator<Integer> generator = new Generator<>(callback -> {
+            for(int i=0;i<max;i++) {
+                if(!callback.yield(i))
+                    return;
+            }
+        });
+
+        for(int i : generator) {
             System.out.println(i);
             if(count++==max)
                 break;
