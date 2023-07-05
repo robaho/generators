@@ -14,7 +14,7 @@ public class GeneratorTest {
 
         Generator<Integer> generator = new Generator<>(callback -> {
             for(int i=0;i<max;i++) {
-                if(!callback.emit(i))
+                if(!callback.yield(i))
                     return;
             }
         });

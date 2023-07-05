@@ -3,7 +3,7 @@ public class PerformanceTest {
         final int COUNT = 1000000;
         Generator<Integer> generator = new Generator<>(callback -> {
             for(int i=0;i<COUNT;i++) {
-                if(!callback.emit(i))
+                if(!callback.yield(i))
                     return;
             }
         });

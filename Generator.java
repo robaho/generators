@@ -42,7 +42,7 @@ public class Generator<T> implements Iterable<T> {
         }
 
         @Override
-        public boolean emit(T value) {
+        public boolean yield(T value) {
             while(!pushValue(value)) {
                 try {
                     ready.acquire();
@@ -121,6 +121,6 @@ public class Generator<T> implements Iterable<T> {
 
     public static interface Callback<T> {
         /** return false if the producer should terminate */
-        boolean emit(T value);
+        boolean yield(T value);
     }
 }
