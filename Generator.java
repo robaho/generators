@@ -49,7 +49,6 @@ public class Generator<T> implements Iterable<T> {
             pushValue(value);
             try {
                 ready.acquire();
-                ready.drainPermits();
             } catch (InterruptedException e) {
                 return false;
             }
