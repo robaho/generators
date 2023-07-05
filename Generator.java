@@ -30,7 +30,10 @@ public class Generator<T> implements Iterable<T> {
                 @Override
                 public void run() {
                     try {
+                        ready.acquire();
                         producer.run(ProducerImpl.this);
+                    } catch (InterruptedException ignore) {
+                        // finally will clean-up
                     } finally {
                         System.out.println("producer is done");
                         IteratorImpl itr = itrRef.get();
@@ -43,16 +46,14 @@ public class Generator<T> implements Iterable<T> {
 
         @Override
         public boolean yield(T value) {
-            while(!pushValue(value)) {
-                try {
-                    ready.acquire();
-                } catch (InterruptedException e) {
-                    return false;
-                }
-                if(itrRef.get()==null)
-                    return false;
+            pushValue(value);
+            try {
+                ready.acquire();
+                ready.drainPermits();
+            } catch (InterruptedException e) {
+                return false;
             }
-            return true;
+            return itrRef.get()==null ? false : true;
         }
         
         private boolean pushValue(T value) {
@@ -79,9 +80,14 @@ public class Generator<T> implements Iterable<T> {
         @Override
         public boolean hasNext() {
             reader = Thread.currentThread();
+            boolean released=false;
             while(true) {
                 if(next.get()!=null)
                     return true;
+                if(!released) {
+                    producer.ready.release();
+                    released=true;
+                }
                 if(done) return false;
                 LockSupport.park();
             }
@@ -93,7 +99,6 @@ public class Generator<T> implements Iterable<T> {
             while(true) {
                 if(!hasNext()) throw new NoSuchElementException();
                 T value = next.getAndSet(null);
-                producer.ready();
                 return value;
             }
         }

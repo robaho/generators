@@ -15,7 +15,7 @@ public class PerformanceTest {
         }
         long diff = System.currentTimeMillis()-start;
         if(count!=COUNT) {
-            throw new IllegalStateException("incorrect number of entries");
+            throw new IllegalStateException("incorrect number of entries, count "+count+", expected "+COUNT);
         }
         System.out.println("time to generate "+COUNT+" values "+diff+" ms");
     }
