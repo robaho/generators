@@ -31,6 +31,8 @@ public class Generator<T> implements Iterable<T> {
                 public void run() {
                     try {
                         ready.acquire();
+                        if(itrRef.get()==null)
+                            return;
                         producer.run(ProducerImpl.this);
                     } catch (InterruptedException ignore) {
                         // finally will clean-up
