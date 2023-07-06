@@ -1,5 +1,6 @@
 public class PerformanceTest {
-    public static void main(String[] args) {
+
+    private static void test() {
         final int COUNT = 1000000;
         Generator<Integer> generator = new Generator<>(callback -> {
             for(int i=0;i<COUNT;i++) {
@@ -18,5 +19,14 @@ public class PerformanceTest {
             throw new IllegalStateException("incorrect number of entries, count "+count+", expected "+COUNT);
         }
         System.out.println("time to generate "+COUNT+" values "+diff+" ms");
+    }
+    public static void main(String[] args) throws InterruptedException {
+        test();
+        // show that using a virtual thread for the reader improves the performance by 10x due to
+        // reduced synchronization costs
+        for(int i=0;i<3;i++) {
+            Thread thread = Thread.startVirtualThread(() -> test());
+            thread.join();
+        }
     }
 }
